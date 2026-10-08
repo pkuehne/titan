@@ -15,4 +15,8 @@ Singleton {
   readonly property color green: "#c3e88d"
   readonly property color yellow: "#ffc777"
   readonly property color red: "#ff757f"
+
+  function signalIcon(strength) {
+    return ["󰤟", "󰤢", "󰤥", "󰤨"][Math.min(3, Math.floor(strength * 4))]
+  }
 }

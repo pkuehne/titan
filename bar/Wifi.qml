@@ -17,8 +17,7 @@ Text {
   text: {
     if (!Networking.wifiEnabled) return "󰤮"
     if (!network) return "󰤯"
-    const bars = ["󰤟", "󰤢", "󰤥", "󰤨"]
-    return bars[Math.min(3, Math.floor(network.signalStrength * 4))]
+    return Theme.signalIcon(network.signalStrength)
   }
 
   property bool open: false
@@ -30,7 +29,9 @@ Text {
 
   WifiPanel {
     visible: root.open
+    device: root.device
     network: root.network
+    onVisibleChanged: root.open = visible
     anchor.item: root
     anchor.edges: Edges.Bottom
     anchor.gravity: Edges.Bottom

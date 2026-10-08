@@ -1,5 +1,6 @@
 import QtQuick
 import Quickshell
+import Quickshell.Wayland
 import qs
 
 PanelWindow {
@@ -10,7 +11,8 @@ PanelWindow {
   }
   implicitHeight: 32
   color: Theme.bg
+  WlrLayershell.keyboardFocus: wifi.open ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
 
   Clock {}
-  Wifi {}
+  Wifi { id: wifi }
 }
