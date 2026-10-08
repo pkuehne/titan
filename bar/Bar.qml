@@ -1,5 +1,6 @@
 import QtQuick
 import Quickshell
+import qs
 
 PanelWindow {
   anchors {
@@ -8,7 +9,8 @@ PanelWindow {
     right: true
   }
   implicitHeight: 32
-  color: "#1a1b26"
+  color: Theme.bg
 
   Clock {}
+  Wifi {}
 }
