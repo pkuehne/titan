@@ -88,19 +88,35 @@ PopupWindow {
       anchors.centerIn: parent
       spacing: 6
 
-      Detail {
-        // Network connectivity status
-        icon: panel.network ? "󰖩" : "󰖪"
-        label: panel.network?.name ?? "Disconnected"
-        tint: panel.network ? Theme.blue : Theme.dim
+      Item {
+        implicitWidth: current.implicitWidth + toggle.implicitWidth + 16
+        implicitHeight: current.implicitHeight
+        width: Math.max(implicitWidth, parent.width)
 
-        TapHandler {
-          enabled: !!panel.network
-          onTapped: panel.selected = panel.selected === panel.network ? null : panel.network
+        Detail {
+          // Network connectivity status
+          id: current
+          icon: panel.network ? "󰖩" : "󰖪"
+          label: panel.network?.name ?? (Networking.wifiEnabled ? "Disconnected" : "Wifi off")
+          tint: panel.network ? Theme.blue : Theme.dim
+
+          TapHandler {
+            enabled: !!panel.network
+            onTapped: panel.selected = panel.selected === panel.network ? null : panel.network
+          }
+          HoverHandler {
+            enabled: !!panel.network
+            cursorShape: Qt.PointingHandCursor
+          }
         }
-        HoverHandler {
-          enabled: !!panel.network
-          cursorShape: Qt.PointingHandCursor
+
+        WifiJoin.Glyph {
+          id: toggle
+          anchors.right: parent.right
+          text: Networking.wifiEnabled ? "󰔡" : "󰨙"
+          color: Networking.wifiEnabled ? Theme.green : Theme.dim
+          active: Networking.wifiHardwareEnabled
+          onClicked: Networking.wifiEnabled = !Networking.wifiEnabled
         }
       }
       WifiJoin {
