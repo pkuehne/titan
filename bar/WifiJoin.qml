@@ -2,11 +2,12 @@ import QtQuick
 import Quickshell.Networking
 import qs
 
-Row {
+Column {
   id: root
   required property var network
   property string password
   property bool unlocked
+  property string error
   readonly property bool needsPassword: !network?.connected && network?.security !== WifiSecurityType.Open
   readonly property bool locked: !!network?.known && !unlocked
   readonly property bool ready: !needsPassword || locked || password.length > 0
@@ -17,7 +18,7 @@ Row {
   signal disconnected()
   signal forgot()
 
-  spacing: 8
+  spacing: 4
 
   component Glyph: Text {
     id: glyph
@@ -39,70 +40,82 @@ Row {
     }
   }
 
-  Rectangle {
-    implicitWidth: 160
-    implicitHeight: input.implicitHeight + 8
-    radius: 4
-    color: "transparent"
-    border.color: root.needsPassword ? Theme.border : "transparent"
+  Row {
+    spacing: 8
 
-    Text {
-      visible: !root.needsPassword
-      anchors.verticalCenter: parent.verticalCenter
-      x: 8
-      text: root.network?.connected ? "Connected" : "Open network"
+    Rectangle {
+      implicitWidth: 160
+      implicitHeight: input.implicitHeight + 8
+      radius: 4
+      color: "transparent"
+      border.color: root.needsPassword ? Theme.border : "transparent"
+
+      Text {
+        visible: !root.needsPassword
+        anchors.verticalCenter: parent.verticalCenter
+        x: 8
+        text: root.network?.connected ? "Connected" : "Open network"
+        color: Theme.dim
+        font.family: Theme.fontFamily
+        font.pixelSize: Theme.fontSize
+      }
+
+      TextInput {
+        id: input
+        visible: root.needsPassword
+        anchors.fill: parent
+        anchors.margins: 4
+        anchors.leftMargin: 8
+        clip: true
+        echoMode: TextInput.Password
+        readOnly: root.locked
+        color: Theme.fg
+        font.family: Theme.fontFamily
+        font.pixelSize: Theme.fontSize
+        text: root.locked ? "saved-pw" : root.password
+        onTextEdited: root.passwordEdited(text)
+        onAccepted: if (root.ready) root.joined()
+        onVisibleChanged: if (visible && !readOnly) forceActiveFocus()
+        onReadOnlyChanged: if (!readOnly) forceActiveFocus()
+        Component.onCompleted: if (visible && !readOnly) forceActiveFocus()
+      }
+    }
+
+    Glyph {
+      visible: root.needsPassword && root.locked
+      text: "󰑐"
       color: Theme.dim
-      font.family: Theme.fontFamily
-      font.pixelSize: Theme.fontSize
+      onClicked: root.unlockRequested()
     }
 
-    TextInput {
-      id: input
-      visible: root.needsPassword
-      anchors.fill: parent
-      anchors.margins: 4
-      anchors.leftMargin: 8
-      clip: true
-      echoMode: TextInput.Password
-      readOnly: root.locked
-      color: Theme.fg
-      font.family: Theme.fontFamily
-      font.pixelSize: Theme.fontSize
-      text: root.locked ? "saved-pw" : root.password
-      onTextEdited: root.passwordEdited(text)
-      onAccepted: if (root.ready) root.joined()
-      onVisibleChanged: if (visible && !readOnly) forceActiveFocus()
-      onReadOnlyChanged: if (!readOnly) forceActiveFocus()
-      Component.onCompleted: if (visible && !readOnly) forceActiveFocus()
+    Glyph {
+      visible: !root.network?.connected
+      text: "󰌘"
+      color: Theme.green
+      active: root.ready
+      onClicked: root.joined()
+    }
+
+    Glyph {
+      visible: !!root.network?.connected
+      text: "󰌸"
+      color: Theme.yellow
+      onClicked: root.disconnected()
+    }
+
+    Glyph {
+      visible: !!root.network?.known
+      text: "󰆴"
+      color: Theme.red
+      onClicked: root.forgot()
     }
   }
 
-  Glyph {
-    visible: root.needsPassword && root.locked
-    text: "󰑐"
-    color: Theme.dim
-    onClicked: root.unlockRequested()
-  }
-
-  Glyph {
-    visible: !root.network?.connected
-    text: "󰌘"
-    color: Theme.green
-    active: root.ready
-    onClicked: root.joined()
-  }
-
-  Glyph {
-    visible: !!root.network?.connected
-    text: "󰌸"
-    color: Theme.yellow
-    onClicked: root.disconnected()
-  }
-
-  Glyph {
-    visible: !!root.network?.known
-    text: "󰆴"
+  Text {
+    visible: !!root.error
+    text: root.error
     color: Theme.red
-    onClicked: root.forgot()
+    font.family: Theme.fontFamily
+    font.pixelSize: Theme.fontSize - 2
   }
 }

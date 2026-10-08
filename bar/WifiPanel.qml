@@ -11,6 +11,7 @@ PopupWindow {
   property var selected: null
   property string password: ""
   property bool unlocked: false
+  property string error: ""
   readonly property var nearby: device?.networks.values
     .filter(n => n.name && !n.connected)
     .sort((a, b) => b.signalStrength - a.signalStrength) ?? []
@@ -31,12 +32,31 @@ PopupWindow {
   onSelectedChanged: {
     password = ""
     unlocked = false
+    error = ""
+  }
+
+  Connections {
+    target: panel.selected
+
+    function onConnectedChanged() {
+      if (panel.selected.connected) panel.selected = null
+    }
+
+    function onConnectionFailed(reason) {
+      if (reason === ConnectionFailReason.NoSecrets) {
+        panel.password = ""
+        panel.unlocked = true
+        panel.error = "Wrong password"
+      } else {
+        panel.error = ConnectionFailReason.toString(reason)
+      }
+    }
   }
 
   function join(network) {
     if (password) network.connectWithPsk(password)
     else network.connect()
-    selected = null
+    error = ""
   }
 
   function disconnect(network) {
@@ -208,7 +228,11 @@ PopupWindow {
                 network: entry.modelData
                 password: panel.password
                 unlocked: panel.unlocked
-                onPasswordEdited: text => panel.password = text
+                error: panel.error
+                onPasswordEdited: text => {
+                  panel.password = text
+                  panel.error = ""
+                }
                 onUnlockRequested: panel.unlocked = true
                 onJoined: panel.join(entry.modelData)
                 onForgot: panel.forget(entry.modelData)
