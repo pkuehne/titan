@@ -14,10 +14,26 @@ PanelWindow {
   WlrLayershell.keyboardFocus: wifi.open ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
 
   Clock {}
-  Wifi { id: wifi }
   Tray {
+    id: tray
     anchors.right: wifi.left
-    anchors.rightMargin: 12
+    anchors.rightMargin: Theme.iconSpacing
     anchors.verticalCenter: parent.verticalCenter
+  }
+  Wifi {
+    id: wifi
+    anchors {
+      right: battery.left
+      rightMargin: Theme.iconSpacing
+      verticalCenter: parent.verticalCenter
+    }
+  }
+  Battery {
+    id: battery
+    anchors {
+      right: parent.right
+      rightMargin: Theme.iconSpacing
+      verticalCenter: parent.verticalCenter
+    }
   }
 }
