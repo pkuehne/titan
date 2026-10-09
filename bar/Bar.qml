@@ -15,4 +15,9 @@ PanelWindow {
 
   Clock {}
   Wifi { id: wifi }
+  Tray {
+    anchors.right: wifi.left
+    anchors.rightMargin: 12
+    anchors.verticalCenter: parent.verticalCenter
+  }
 }
