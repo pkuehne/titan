@@ -31,6 +31,14 @@ PanelWindow {
   Battery {
     id: battery
     anchors {
+      right: power.left
+      rightMargin: Theme.iconSpacing
+      verticalCenter: parent.verticalCenter
+    }
+  }
+  Power {
+    id: power
+    anchors {
       right: parent.right
       rightMargin: Theme.iconSpacing
       verticalCenter: parent.verticalCenter
