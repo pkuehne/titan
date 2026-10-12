@@ -9,9 +9,35 @@ PanelWindow {
   id: root
 
   readonly property int iconSize: 24
-  readonly property var apps: DesktopEntries.applications.values
+  readonly property string installDir: Quickshell.shellDir + "/launcher/install"
+  readonly property var known: [
+    { id: "firefox", name: "Firefox" },
+    { id: "discord", name: "Discord" },
+    { id: "com.onepassword.OnePassword", name: "1Password", icon: "1password" },
+    { id: "obsidian", name: "Obsidian" },
+    { id: "steam", name: "Steam" },
+    { id: "syncthing-ui", name: "Syncthing", icon: "syncthing" },
+    { id: "localsend", name: "LocalSend" },
+    { id: "kitty", name: "Kitty" },
+  ]
+  readonly property var installed: DesktopEntries.applications.values
+  readonly property var missing: known
+    .filter(app => !installed.some(entry => entry.id === app.id))
+    .map(app => Object.assign({
+      icon: app.id,
+      genericName: "",
+      keywords: [],
+      install: `${installDir}/${app.name.toLowerCase()}.sh`,
+    }, app))
+  readonly property var apps: [...installed, ...missing]
     .filter(app => !app.noDisplay && matches(app, input.text.toLowerCase()))
-    .sort((a, b) => a.name.localeCompare(b.name))
+    .sort((a, b) => rank(a) - rank(b) || a.name.localeCompare(b.name))
+
+  function rank(app) {
+    const index = known.findIndex(entry => entry.id === app.id)
+    if (index < 0) return 2 * known.length
+    return app.install ? known.length + index : index
+  }
 
   function matches(app, query) {
     return [app.name, app.genericName, ...app.keywords]
@@ -20,7 +46,8 @@ PanelWindow {
 
   function launch(app) {
     visible = false
-    app.execute()
+    if (app.install) Quickshell.execDetached(["kitty", "--hold", app.install])
+    else app.execute()
   }
 
   visible: false
@@ -133,6 +160,17 @@ PanelWindow {
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSize
           }
+        }
+
+        Text {
+          visible: !!entry.modelData.install
+          anchors.verticalCenter: parent.verticalCenter
+          anchors.right: parent.right
+          anchors.rightMargin: 8
+          text: "install"
+          color: Theme.dim
+          font.family: Theme.fontFamily
+          font.pixelSize: Theme.fontSize
         }
 
         HoverHandler {
