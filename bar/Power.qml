@@ -19,6 +19,7 @@ Text {
   PowerPanel {
     visible: root.open
     onVisibleChanged: root.open = visible
+    onActionTriggered: root.open = false
     anchor.item: root
     anchor.edges: Edges.Bottom
     anchor.gravity: Edges.Bottom

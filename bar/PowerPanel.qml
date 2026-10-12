@@ -4,6 +4,7 @@ import qs
 
 PopupWindow {
   id: panel
+  signal actionTriggered
 
   grabFocus: true
 
@@ -38,7 +39,7 @@ PopupWindow {
 
           TapHandler {
             onTapped: {
-              panel.visible = false
+              panel.actionTriggered()
               Quickshell.execDetached(["systemctl", action.modelData[2]])
             }
           }
