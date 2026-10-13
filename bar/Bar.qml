@@ -16,9 +16,17 @@ PanelWindow {
   Clock {}
   Tray {
     id: tray
-    anchors.right: bluetooth.left
+    anchors.right: volume.left
     anchors.rightMargin: Theme.iconSpacing
     anchors.verticalCenter: parent.verticalCenter
+  }
+  Volume {
+    id: volume
+    anchors {
+      right: bluetooth.left
+      rightMargin: Theme.iconSpacing
+      verticalCenter: parent.verticalCenter
+    }
   }
   Bluetooth {
     id: bluetooth

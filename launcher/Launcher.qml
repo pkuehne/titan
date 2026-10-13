@@ -13,10 +13,10 @@ PanelWindow {
   readonly property var known: [
     { id: "firefox", name: "Firefox" },
     { id: "discord", name: "Discord" },
-    { id: "com.onepassword.OnePassword", name: "1Password", icon: "1password" },
+    { id: "com.onepassword.OnePassword", name: "1Password" },
     { id: "obsidian", name: "Obsidian" },
     { id: "steam", name: "Steam" },
-    { id: "syncthing-ui", name: "Syncthing", icon: "syncthing" },
+    { id: "syncthing-ui", name: "Syncthing" },
     { id: "localsend", name: "LocalSend" },
     { id: "kitty", name: "Kitty" },
   ]
@@ -24,7 +24,7 @@ PanelWindow {
   readonly property var missing: known
     .filter(app => !installed.some(entry => entry.id === app.id))
     .map(app => Object.assign({
-      icon: app.id,
+      icon: "application-x-executable",
       genericName: "",
       keywords: [],
       install: `${installDir}/${app.name.toLowerCase()}.sh`,
