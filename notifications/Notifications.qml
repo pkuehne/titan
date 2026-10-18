@@ -1,3 +1,5 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import Quickshell
 import Quickshell.Services.Notifications
@@ -6,32 +8,31 @@ import qs
 PanelWindow {
   id: root
 
-  readonly property int timeoutMs: 5000
+  readonly property int defaultTimeoutMs: 5000
   readonly property int cardWidth: 360
+  readonly property int gap: 8
 
   NotificationServer {
     id: server
     onNotification: notification => notification.tracked = true
   }
 
-  visible: server.trackedNotifications.values.length > 0
+  visible: notifications.count > 0
   anchors {
     top: true
     right: true
   }
-  margins {
-    top: 8
-    right: 8
-  }
-  implicitWidth: cardWidth
-  implicitHeight: cards.implicitHeight
+  implicitWidth: cardWidth + gap
+  implicitHeight: cards.implicitHeight + gap
   color: "transparent"
 
   Column {
     id: cards
-    spacing: 8
+    y: root.gap
+    spacing: root.gap
 
     Repeater {
+      id: notifications
       model: server.trackedNotifications
 
       Rectangle {
@@ -45,8 +46,8 @@ PanelWindow {
         border.color: Theme.border
 
         Timer {
-          running: true
-          interval: root.timeoutMs
+          running: card.modelData.expireTimeout !== 0
+          interval: card.modelData.expireTimeout > 0 ? card.modelData.expireTimeout : root.defaultTimeoutMs
           onTriggered: card.modelData.expire()
         }
 
