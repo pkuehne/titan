@@ -1,3 +1,5 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import QtQuick.Controls
 import Quickshell
@@ -210,12 +212,12 @@ PopupWindow {
               spacing: list.spacing
 
               Detail {
-                icon: Theme.signalIcon(modelData.signalStrength)
-                label: modelData.name + (modelData.security === WifiSecurityType.Open ? "" : "  󰌾")
-                tint: modelData.stateChanging ? Theme.yellow : modelData.known ? Theme.blue : Theme.dim
+                icon: Theme.signalIcon(entry.modelData.signalStrength)
+                label: entry.modelData.name + (entry.modelData.security === WifiSecurityType.Open ? "" : "  󰌾")
+                tint: entry.modelData.stateChanging ? Theme.yellow : entry.modelData.known ? Theme.blue : Theme.dim
 
                 TapHandler {
-                  onTapped: panel.selected = panel.selected === modelData ? null : modelData
+                  onTapped: panel.selected = panel.selected === entry.modelData ? null : entry.modelData
                 }
                 HoverHandler {
                   cursorShape: Qt.PointingHandCursor
