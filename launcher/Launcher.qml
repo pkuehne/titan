@@ -19,6 +19,7 @@ PanelWindow {
     { id: "syncthing-ui", name: "Syncthing" },
     { id: "localsend", name: "LocalSend" },
     { id: "kitty", name: "Kitty" },
+    { id: "com.anthropic.Claude", name: "Claude" },
   ]
   readonly property var installed: DesktopEntries.applications.values
   readonly property var missing: known
