@@ -58,7 +58,7 @@ PopupWindow {
         implicitHeight: current.implicitHeight
         width: Math.max(implicitWidth, parent.width)
 
-        WifiPanel.Detail {
+        Detail {
           id: current
           icon: panel.adapter?.enabled ? "󰂯" : "󰂲"
           label: panel.adapter ? BluetoothAdapterState.toString(panel.adapter.state) : "No adapter"
@@ -103,7 +103,7 @@ PopupWindow {
             }
           }
 
-          WifiPanel.Detail {
+          Detail {
             icon: panel.icons[entry.modelData.icon] ?? "󰂯"
             label: entry.modelData.name
               + (entry.modelData.batteryAvailable ? `  ${Math.round(entry.modelData.battery * 100)}%` : "")

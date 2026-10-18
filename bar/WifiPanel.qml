@@ -77,28 +77,6 @@ PopupWindow {
   implicitHeight: details.implicitHeight + 24
   color: "transparent"
 
-  // Reusable component row
-  component Detail: Row {
-    property alias icon: glyph.text
-    property alias label: label.text
-    property color tint: Theme.fg
-    spacing: 10
-
-    Text {
-      id: glyph
-      width: 16
-      color: parent.tint
-      font.family: Theme.fontFamily
-      font.pixelSize: Theme.fontSize
-    }
-    Text {
-      id: label
-      color: Theme.fg
-      font.family: Theme.fontFamily
-      font.pixelSize: Theme.fontSize
-    }
-  }
-
   Rectangle {
     anchors.fill: parent
     radius: 8

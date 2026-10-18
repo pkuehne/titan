@@ -30,7 +30,7 @@ PopupWindow {
       anchors.centerIn: parent
       spacing: 6
 
-      WifiPanel.Detail {
+      Detail {
         // Output device
         icon: "󰓃"
         label: panel.label

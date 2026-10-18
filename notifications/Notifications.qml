@@ -3,6 +3,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import Quickshell
 import Quickshell.Services.Notifications
+import Quickshell.Widgets
 import qs
 
 PanelWindow {
@@ -11,6 +12,17 @@ PanelWindow {
   readonly property int defaultTimeoutMs: 5000
   readonly property int cardWidth: 360
   readonly property int gap: 8
+  readonly property int iconSize: 32
+
+  function icon(notification) {
+    if (notification.image) return notification.image
+    const name = notification.appIcon
+      || DesktopEntries.heuristicLookup(notification.desktopEntry || notification.appName)?.icon
+      || ""
+    if (name.startsWith("/")) return `file://${name}`
+    if (name.includes("://")) return name
+    return name ? Quickshell.iconPath(name, true) : ""
+  }
 
   NotificationServer {
     id: server
@@ -56,7 +68,7 @@ PanelWindow {
           onClicked: card.modelData.dismiss()
         }
 
-        Column {
+        Row {
           id: content
           anchors {
             left: parent.left
@@ -64,27 +76,39 @@ PanelWindow {
             verticalCenter: parent.verticalCenter
             margins: 16
           }
-          spacing: 4
+          spacing: 12
 
-          Text {
-            width: parent.width
-            text: card.modelData.summary
-            color: Theme.fg
-            font.family: Theme.fontFamily
-            font.pixelSize: Theme.fontSize
-            font.bold: true
-            elide: Text.ElideRight
+          IconImage {
+            id: appIcon
+            visible: source.toString() !== ""
+            implicitSize: root.iconSize
+            source: root.icon(card.modelData)
           }
-          Text {
-            width: parent.width
-            visible: text !== ""
-            text: card.modelData.body
-            color: Theme.dim
-            font.family: Theme.fontFamily
-            font.pixelSize: Theme.fontSize
-            wrapMode: Text.Wrap
-            maximumLineCount: 4
-            elide: Text.ElideRight
+
+          Column {
+            width: parent.width - (appIcon.visible ? appIcon.width + parent.spacing : 0)
+            spacing: 4
+
+            Text {
+              width: parent.width
+              text: card.modelData.summary
+              color: Theme.fg
+              font.family: Theme.fontFamily
+              font.pixelSize: Theme.fontSize
+              font.bold: true
+              elide: Text.ElideRight
+            }
+            Text {
+              width: parent.width
+              visible: text !== ""
+              text: card.modelData.body
+              color: Theme.dim
+              font.family: Theme.fontFamily
+              font.pixelSize: Theme.fontSize
+              wrapMode: Text.Wrap
+              maximumLineCount: 4
+              elide: Text.ElideRight
+            }
           }
         }
       }

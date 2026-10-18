@@ -27,26 +27,26 @@ PopupWindow {
       anchors.centerIn: parent
       spacing: 6
 
-      WifiPanel.Detail {
+      Detail {
         // Charge level
         icon: panel.icon
         label: `${Math.round(panel.device.percentage * 100)}%`
         tint: panel.device.percentage >= 0.6 ? Theme.green : panel.device.percentage >= 0.3 ? Theme.yellow : Theme.red
       }
-      WifiPanel.Detail {
+      Detail {
         // Charging state
         icon: UPower.onBattery ? "󰚦" : "󰚥"
         label: UPowerDeviceState.toString(panel.device.state)
         tint: Theme.dim
       }
-      WifiPanel.Detail {
+      Detail {
         // Time until empty or full
         visible: panel.remaining > 0
         icon: "󰅐"
         label: `${Math.floor(panel.remaining / 3600)}h ${Math.floor(panel.remaining % 3600 / 60)}m until ${UPower.onBattery ? "empty" : "full"}`
         tint: Theme.dim
       }
-      WifiPanel.Detail {
+      Detail {
         // Battery health, as capacity relative to design
         visible: panel.battery?.healthSupported ?? false
         icon: "󰗶"
@@ -87,7 +87,7 @@ PopupWindow {
           font.pixelSize: Theme.fontSize
         }
       }
-      WifiPanel.Detail {
+      Detail {
         // Why performance is being throttled
         visible: PowerProfiles.degradationReason !== PerformanceDegradationReason.None
         icon: "󰀦"

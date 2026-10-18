@@ -32,7 +32,7 @@ PopupWindow {
           ["󰐥", "Shut down", "poweroff", Theme.red]
         ]
 
-        WifiPanel.Detail {
+        Detail {
           id: action
           required property var modelData
           icon: modelData[0]
