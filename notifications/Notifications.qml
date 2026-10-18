@@ -26,6 +26,7 @@ PanelWindow {
 
   NotificationServer {
     id: server
+    actionsSupported: true
     onNotification: notification => notification.tracked = true
   }
 
@@ -50,22 +51,45 @@ PanelWindow {
       Rectangle {
         id: card
         required property var modelData
+        readonly property bool critical: modelData.urgency === NotificationUrgency.Critical
 
         width: root.cardWidth
         height: content.implicitHeight + 24
         radius: 8
         color: Theme.bg
-        border.color: Theme.border
+        border.color: critical ? Theme.red : Theme.border
 
-        Timer {
-          running: card.modelData.expireTimeout !== 0
-          interval: card.modelData.expireTimeout > 0 ? card.modelData.expireTimeout : root.defaultTimeoutMs
-          onTriggered: card.modelData.expire()
+        Rectangle {
+          visible: countdown.running
+          anchors {
+            left: parent.left
+            bottom: parent.bottom
+            margins: 4
+          }
+          width: card.width - 8
+          height: 2
+          radius: 1
+          color: Theme.blue
+
+          NumberAnimation on width {
+            id: countdown
+            to: 0
+            duration: card.modelData.expireTimeout > 0 ? card.modelData.expireTimeout : root.defaultTimeoutMs
+            running: !card.critical && card.modelData.expireTimeout !== 0
+            paused: hover.containsMouse
+            onFinished: card.modelData.expire()
+          }
         }
 
         MouseArea {
+          id: hover
           anchors.fill: parent
-          onClicked: card.modelData.dismiss()
+          hoverEnabled: true
+          onClicked: {
+            const action = card.modelData.actions.find(a => a.identifier === "default")
+            if (action) action.invoke()
+            else card.modelData.dismiss()
+          }
         }
 
         Row {
