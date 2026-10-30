@@ -13,6 +13,13 @@ PanelWindow {
   color: Theme.bg
   WlrLayershell.keyboardFocus: wifi.open ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
 
+  Workspaces {
+    anchors {
+      left: parent.left
+      leftMargin: Theme.iconSpacing
+      verticalCenter: parent.verticalCenter
+    }
+  }
   Clock {}
   Tray {
     id: tray
