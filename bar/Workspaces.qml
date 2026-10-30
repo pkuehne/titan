@@ -18,8 +18,10 @@ Row {
     Text {
       id: label
       required property var modelData
+      readonly property bool focused: Hyprland.focusedWorkspace?.id === modelData
       readonly property bool occupied: Hyprland.workspaces.values.some(w => w.id === modelData)
-      color: Hyprland.focusedWorkspace?.id === modelData ? Theme.blue : occupied ? Theme.fg : Theme.dim
+      color: focused ? Theme.fg : occupied ? Theme.blue : Theme.dim
+      font.bold: focused
       font.family: Theme.fontFamily
       font.pixelSize: Theme.fontSize
       text: modelData
