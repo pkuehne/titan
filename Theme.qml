@@ -8,7 +8,7 @@ Singleton {
   readonly property int fontSize: 14
   readonly property int iconSpacing: 12
 
-  readonly property color bg: "#222436"
+  readonly property color bg: "#cc222436"
   readonly property color fg: "#c8d3f5"
   readonly property color dim: "#636da6"
   readonly property color border: "#3b4261"
