@@ -73,11 +73,23 @@ PanelWindow {
 
           NumberAnimation on width {
             id: countdown
+            from: card.width - 8
             to: 0
             duration: card.modelData.expireTimeout > 0 ? card.modelData.expireTimeout : root.defaultTimeoutMs
             running: !card.critical && card.modelData.expireTimeout !== 0
-            paused: hover.containsMouse
             onFinished: card.modelData.expire()
+          }
+        }
+
+        Connections {
+          target: card.modelData
+
+          function onSummaryChanged() {
+            countdown.restart()
+          }
+
+          function onBodyChanged() {
+            countdown.restart()
           }
         }
 
@@ -85,6 +97,7 @@ PanelWindow {
           id: hover
           anchors.fill: parent
           hoverEnabled: true
+          onContainsMouseChanged: if (countdown.running) countdown.paused = containsMouse
           onClicked: {
             const action = card.modelData.actions.find(a => a.identifier === "default")
             if (action) action.invoke()
