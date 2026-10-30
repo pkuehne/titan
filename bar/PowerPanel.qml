@@ -27,9 +27,10 @@ PopupWindow {
 
       Repeater {
         model: [
-          ["󰒲", "Hibernate", "hibernate", Theme.blue],
-          ["󰜉", "Restart", "reboot", Theme.yellow],
-          ["󰐥", "Shut down", "poweroff", Theme.red]
+          ["󰌾", "Lock", ["loginctl", "lock-session"], Theme.green],
+          ["󰒲", "Hibernate", ["systemctl", "hibernate"], Theme.blue],
+          ["󰜉", "Restart", ["systemctl", "reboot"], Theme.yellow],
+          ["󰐥", "Shut down", ["systemctl", "poweroff"], Theme.red]
         ]
 
         Detail {
@@ -42,7 +43,7 @@ PopupWindow {
           TapHandler {
             onTapped: {
               panel.actionTriggered()
-              Quickshell.execDetached(["systemctl", action.modelData[2]])
+              Quickshell.execDetached(action.modelData[2])
             }
           }
           HoverHandler {
