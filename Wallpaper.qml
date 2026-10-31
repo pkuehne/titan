@@ -20,7 +20,7 @@ Variants {
 
     Image {
       anchors.fill: parent
-      source: "wallpaper.jpg"
+      source: WallpaperState.current ? "file://" + WallpaperState.current : ""
       fillMode: Image.PreserveAspectCrop
     }
   }

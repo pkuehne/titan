@@ -6,6 +6,7 @@ import qs.keybinds
 import qs.launcher
 import qs.media
 import qs.notifications
+import qs.wallpaper
 
 ShellRoot {
   Wallpaper {}
@@ -14,5 +15,6 @@ ShellRoot {
   Keybinds {}
   Clipboard {}
   Media {}
+  WallpaperPicker {}
   Notifications {}
 }
