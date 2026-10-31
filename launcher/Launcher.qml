@@ -20,6 +20,7 @@ PanelWindow {
     { id: "steam", name: "Steam" },
     { id: "syncthing-ui", name: "Syncthing" },
     { id: "localsend", name: "LocalSend" },
+    { id: "aseprite", name: "Aseprite" },
     { id: "kitty", name: "Kitty" },
     { id: "com.anthropic.Claude", name: "Claude" },
   ]
