@@ -12,6 +12,32 @@ Text {
     let iconIndex = Math.round(UPower.displayDevice.percentage * 10)
     return UPower.onBattery ? dischargingIcons[iconIndex] : chargingIcons[iconIndex]
   }
+  readonly property real percentage: UPower.displayDevice.percentage
+  readonly property var lowThresholds: [0.05, 0.1]
+  property real warnedAt: 1
+
+  function warnIfLow() {
+    if (!UPower.onBattery) {
+      warnedAt = 1
+      return
+    }
+    const threshold = lowThresholds.find(t => percentage <= t && t < warnedAt)
+    if (threshold === undefined) return
+    warnedAt = threshold
+    const urgency = threshold === lowThresholds[0] ? "critical" : "normal"
+    Quickshell.execDetached(["notify-send", "-u", urgency, "-a", "Battery", "Battery low", `${Math.round(percentage * 100)}% remaining`])
+  }
+
+  onPercentageChanged: warnIfLow()
+  Component.onCompleted: warnIfLow()
+
+  Connections {
+    target: UPower
+
+    function onOnBatteryChanged() {
+      root.warnIfLow()
+    }
+  }
 
   anchors {
     right: parent.right
