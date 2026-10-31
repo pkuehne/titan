@@ -23,9 +23,17 @@ PanelWindow {
   Clock {}
   Tray {
     id: tray
-    anchors.right: volume.left
+    anchors.right: brightness.left
     anchors.rightMargin: Theme.iconSpacing
     anchors.verticalCenter: parent.verticalCenter
+  }
+  Brightness {
+    id: brightness
+    anchors {
+      right: volume.left
+      rightMargin: Theme.iconSpacing
+      verticalCenter: parent.verticalCenter
+    }
   }
   Volume {
     id: volume
