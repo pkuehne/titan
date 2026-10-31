@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Controls
 import Quickshell
 import qs
 
@@ -49,38 +48,12 @@ PopupWindow {
           onClicked: panel.audio.muted = !panel.audio.muted
         }
 
-        Slider {
-          id: slider
+        LevelSlider {
           anchors.verticalCenter: parent.verticalCenter
-          implicitWidth: 160
           enabled: !!panel.audio
           value: panel.audio?.volume ?? 0
+          fill: panel.muted ? Theme.dim : Theme.blue
           onMoved: panel.audio.volume = value
-
-          background: Rectangle {
-            x: slider.leftPadding
-            y: slider.topPadding + (slider.availableHeight - height) / 2
-            width: slider.availableWidth
-            height: 4
-            radius: 2
-            color: Theme.border
-
-            Rectangle {
-              width: slider.visualPosition * parent.width
-              height: parent.height
-              radius: 2
-              color: panel.muted ? Theme.dim : Theme.blue
-            }
-          }
-
-          handle: Rectangle {
-            x: slider.leftPadding + slider.visualPosition * (slider.availableWidth - width)
-            y: slider.topPadding + (slider.availableHeight - height) / 2
-            implicitWidth: 12
-            implicitHeight: 12
-            radius: 6
-            color: Theme.fg
-          }
         }
 
         Text {
