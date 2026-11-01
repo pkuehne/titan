@@ -1,0 +1,121 @@
+#!/usr/bin/env bash
+# fanctl — platform-profile control and fan telemetry for titan's fan widget.
+#
+# The ACPI platform profile is the knob that actually drives the fan curve, so
+# that is the only thing this writes. Kept dependency-free and sysfs-only: no
+# power-profiles-daemon, nothing that reinterprets the request into a smaller
+# set of profiles.
+#
+# Writing the profile needs group write on the sysfs attribute, granted by
+# /etc/udev/rules.d/90-platform-profile.rules, installed by desktop/install.sh.
+
+set -uo pipefail
+
+# Kernels since 6.14 expose the profile as a real class device, which is what
+# a udev rule can match on. The legacy firmware attribute is the fallback, but
+# it is a different inode and the rule does not reach it.
+find_profile_file() {
+  local f
+  for f in /sys/class/platform-profile/*/profile; do
+    if [[ -e $f ]]; then printf '%s' "$f"; return 0; fi
+  done
+  if [[ -e /sys/firmware/acpi/platform_profile ]]; then
+    printf '%s' /sys/firmware/acpi/platform_profile
+    return 0
+  fi
+  return 1
+}
+
+choices_for() {
+  if [[ $1 == /sys/class/platform-profile/* ]]; then
+    printf '%s' "${1%/profile}/choices"
+  else
+    printf '%s' /sys/firmware/acpi/platform_profile_choices
+  fi
+}
+
+# Several drivers can front the same physical fans — on this box alienware_wmi,
+# dell_ddv and dell_smm all report the same two. Score them so the panel gets
+# the one that names its fans and publishes a ceiling to draw a bar against.
+pick_hwmon() {
+  local h best="" best_score=-1 score
+  for h in /sys/class/hwmon/hwmon*; do
+    compgen -G "$h/fan[0-9]_input" >/dev/null || continue
+    score=0
+    compgen -G "$h/fan[0-9]_label"  >/dev/null && score=$((score + 4))
+    compgen -G "$h/fan[0-9]_max"    >/dev/null && score=$((score + 2))
+    compgen -G "$h/temp[0-9]_label" >/dev/null && score=$((score + 1))
+    if (( score > best_score )); then best=$h; best_score=$score; fi
+  done
+  [[ -n $best ]] || return 1
+  printf '%s' "$best"
+}
+
+read_or() { cat "$1" 2>/dev/null || printf '%s' "$2"; }
+kv() { printf '%s\t%s\n' "$1" "$2"; }
+
+cmd_sensors() {
+  local pf choices hw f n label max milli
+  pf=$(find_profile_file) || return 0
+
+  kv profile "$(read_or "$pf" "")"
+  choices=$(choices_for "$pf")
+  [[ -r $choices ]] && kv choices "$(read_or "$choices" "")"
+  if [[ -w $pf ]]; then kv writable 1; else kv writable 0; fi
+
+  hw=$(pick_hwmon) || return 0
+  kv driver "$(read_or "$hw/name" "")"
+
+  for f in "$hw"/fan[0-9]_input; do
+    [[ -e $f ]] || continue
+    n=${f##*/}; n=${n%_input}
+    label=$(read_or "${f%_input}_label" "")
+    [[ -n $label ]] || label="Fan ${n#fan}"
+    max=$(read_or "${f%_input}_max" "0")
+    kv "$n.label" "$label"
+    kv "$n.rpm"   "$(read_or "$f" "0")"
+    kv "$n.max"   "${max:-0}"
+  done
+
+  # Only labelled temperatures: an unlabelled ramp of nine sensors is noise in
+  # a popup this size, and drivers that bother to label them pick the useful ones.
+  for f in "$hw"/temp[0-9]_input; do
+    [[ -e $f ]] || continue
+    n=${f##*/}; n=${n%_input}
+    label=$(read_or "${f%_input}_label" "")
+    [[ -n $label ]] || continue
+    milli=$(read_or "$f" "")
+    [[ -n $milli ]] || continue
+    kv "$n.label" "$label"
+    kv "$n.c"     "$(( milli / 1000 ))"
+  done
+}
+
+cmd_set() {
+  local want=${1:-} pf choices list
+  [[ -n $want ]] || { echo "usage: fanctl set <profile>" >&2; return 2; }
+
+  pf=$(find_profile_file) || { echo "no ACPI platform profile on this system" >&2; return 1; }
+  choices=$(choices_for "$pf")
+  if [[ -r $choices ]]; then
+    list=" $(read_or "$choices" "") "
+    [[ $list == *" $want "* ]] || { echo "unknown profile: $want" >&2; return 1; }
+  fi
+  [[ -w $pf ]] || { echo "no write permission on $pf — install the udev rule" >&2; return 1; }
+
+  printf '%s' "$want" >"$pf"
+}
+
+cmd_get() {
+  local pf
+  pf=$(find_profile_file) || return 1
+  read_or "$pf" ""
+  echo
+}
+
+case "${1:-sensors}" in
+  sensors) cmd_sensors ;;
+  get)     cmd_get ;;
+  set)     shift; cmd_set "${1:-}" ;;
+  *)       echo "usage: fanctl [sensors|get|set <profile>]" >&2; exit 2 ;;
+esac

@@ -53,47 +53,6 @@ PopupWindow {
         label: `${Math.round(panel.battery?.healthPercentage ?? 0)}% health`
         tint: panel.battery?.healthPercentage >= 80 ? Theme.green : panel.battery?.healthPercentage >= 60 ? Theme.yellow : Theme.red
       }
-
-      Rectangle {
-        // Divider
-        width: parent.width
-        height: 1
-        color: Theme.border
-      }
-
-      Row {
-        // Power profile picker
-        spacing: 12
-
-        Repeater {
-          model: [
-            [PowerProfile.PowerSaver, "󰌪"],
-            [PowerProfile.Balanced, "󰗑"],
-            [PowerProfile.Performance, "󰓅"]
-          ]
-
-          WifiJoin.Glyph {
-            required property var modelData
-            text: modelData[1]
-            color: PowerProfiles.profile === modelData[0] ? Theme.blue : Theme.dim
-            active: modelData[0] !== PowerProfile.Performance || PowerProfiles.hasPerformanceProfile
-            onClicked: PowerProfiles.profile = modelData[0]
-          }
-        }
-        Text {
-          text: PowerProfile.toString(PowerProfiles.profile)
-          color: Theme.fg
-          font.family: Theme.fontFamily
-          font.pixelSize: Theme.fontSize
-        }
-      }
-      Detail {
-        // Why performance is being throttled
-        visible: PowerProfiles.degradationReason !== PerformanceDegradationReason.None
-        icon: "󰀦"
-        label: PerformanceDegradationReason.toString(PowerProfiles.degradationReason)
-        tint: Theme.yellow
-      }
     }
   }
 }

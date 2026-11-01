@@ -54,6 +54,14 @@ PanelWindow {
   Wifi {
     id: wifi
     anchors {
+      right: fans.left
+      rightMargin: Theme.iconSpacing
+      verticalCenter: parent.verticalCenter
+    }
+  }
+  Fans {
+    id: fans
+    anchors {
       right: battery.left
       rightMargin: Theme.iconSpacing
       verticalCenter: parent.verticalCenter
