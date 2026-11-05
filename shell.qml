@@ -2,6 +2,7 @@
 import Quickshell
 import qs.bar
 import qs.clipboard
+import qs.emoji
 import qs.keybinds
 import qs.launcher
 import qs.media
@@ -14,6 +15,7 @@ ShellRoot {
   Launcher {}
   Keybinds {}
   Clipboard {}
+  EmojiPicker {}
   Media {}
   WallpaperPicker {}
   Notifications {}
